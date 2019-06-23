@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    <!--创建安全管理器，将自定义realm传进去-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="myRealm"/>
+    </bean>
+    <!--自定义realm-->
+    <bean id="myRealm" class="com.fours.shiro.Realm">
+        <!--注入一个密码匹配器-->
+        <property name="credentialsMatcher">
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <!--加密方式-->
+                <property name="hashAlgorithmName" value="MD5"/>
+                <!--加密次数-->
+                <property name="hashIterations" value="10"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!--权限过滤器-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <!--登陆路径-->
+        <property name="loginUrl" value="/login/index"/>
+        <!--登陆成功的路径-->
+        <property name="successUrl" value="/main"/>
+        <!--没有授权时的跳转路径-->
+        <property name="unauthorizedUrl" value="/login/index"/>
+        <!--使用自定义的类 作为拦截路径-->
+        <property name="filterChainDefinitionMap" ref="filterMap"/>
+        <!--filters属性来自定义权限过滤器,用来判断当前请求是否有权限访问该页面-->
+        <property name="filters">
+            <map>
+                <entry key="ammFilter">
+                    <bean id="ammPermissionsAuthorizationFilter" class="com.fours.filter.AmmPermissionsAuthorizationFilter"></bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <!--创建自定义的权限过滤器,让自定义的过滤器来判断权限-->
+    <!--这里创建的是自定义的权限集合,将写在配置文件中的权限,使用自定义的类来完成-->
+    <bean id="filterMap" factory-bean="filter" factory-method="creatMap"></bean>
+    <bean id="filter" class="com.fours.shiro.FilterChainDefinitions"></bean>
+</beans>

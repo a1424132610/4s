@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+">
+
+    <!-- 2.开启aop，对类代理强制使用cglib代理 -->
+    <aop:config proxy-target-class="true"/>
+    <!-- 3开启注解AOP (前提是引入aop命名空间和相关jar包) 暴露代理类-->
+    <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="true"/>
+
+
+    <!--扫描Controller-->
+    <context:component-scan base-package="com.fours.controller" />
+    <!--支持SpringMVC的注解-->
+    <mvc:annotation-driven />
+    <!--静态资源放行-->
+    <mvc:default-servlet-handler />
+    <!--视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+    <!--上传解析器-->
+    <!--文件上传解析器-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 设置上传文件的最大尺寸为1MB -->
+        <property name="maxUploadSize">
+            <value>1048576</value>
+        </property>
+    </bean>
+</beans>

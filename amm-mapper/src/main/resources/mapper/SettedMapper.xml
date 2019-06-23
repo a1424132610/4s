@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fours.mapper.SettedMapper" >
+  <resultMap id="BaseResultMap" type="com.fours.domain.Setted" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="custormer_id" property="custormerId" jdbcType="VARCHAR" />
+    <result column="setted_time" property="settedTime" jdbcType="TIMESTAMP" />
+    <result column="amount_id" property="amountId" jdbcType="DECIMAL" />
+    <result column="total_money" property="totalMoney" jdbcType="DECIMAL" />
+    <result column="pay_id" property="payId" jdbcType="INTEGER" />
+    <result column="repairorder_id" property="repairorderId" jdbcType="BIGINT" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_setted
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+
+  <insert id="insert" parameterType="com.fours.domain.Setted" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_setted (custormer_id, amount_id, setted_time,
+      total_money, pay_id, repairorder_id, 
+      address)
+    values (#{custormerId}, #{amountId}, #{settedTime},
+      #{totalMoney}, #{payId}, #{repairorderId},
+      #{address})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.fours.domain.Setted" >
+    update t_setted
+    set custormer_id = #{custormerId},
+      setted_time = #{settedTime,jdbcType=TIMESTAMP},
+      amount_id = #{amountId,jdbcType=DECIMAL},
+      total_money = #{totalMoney,jdbcType=DECIMAL},
+      pay_id = #{payId,jdbcType=INTEGER},
+      repairorder_id = #{repairorderId,jdbcType=BIGINT},
+      address = #{address,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, custormer_id, setted_time, amount_id, total_money, pay_id, repairorder_id, 
+    address
+    from t_setted
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, custormer_id, setted_time, amount_id, total_money, pay_id, repairorder_id, 
+    address
+    from t_setted
+  </select>
+  <select id="selectByPage" resultMap="BaseResultMap" >
+    select  t.id, t.custormer_id, t.setted_time, t.amount_id, t.total_money, t.pay_id, t.repairorder_id,
+    t.address
+    from t_setted  t
+	JOIN t_repairorder r on t.repairorder_id=r.id where r.zt=false
+  </select>
+
+</mapper>

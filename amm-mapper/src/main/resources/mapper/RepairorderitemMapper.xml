@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fours.mapper.RepairorderitemMapper" >
+  <resultMap id="BaseResultMap" type="com.fours.domain.Repairorderitem" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <id column="opid" property="opid" jdbcType="VARCHAR" />
+    <result column="mainid" property="mainid" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="VARCHAR" />
+    <result column="amt1" property="amt1" jdbcType="DECIMAL" />
+    <result column="amt2" property="amt2" jdbcType="DECIMAL" />
+    <result column="num" property="num" jdbcType="INTEGER" />
+    <result column="totalamt" property="totalamt" jdbcType="DECIMAL" />
+
+
+  <!--  <association property="mainid" javaType="com.fours.domain.Maintainer" >
+      <id column="id" property="optid"/>
+      <result column="mainid" property="optName"></result>
+    </association>
+
+    <association property="id" javaType="com.fours.domain.Parts">
+      <id column="id" property="id"></id>
+      <result column="pid" property="partsName"></result>
+    </association>-->
+
+
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="map" >
+    delete from t_repairorderitem
+    where id = #{id,jdbcType=BIGINT}
+      and opid = #{opid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.fours.domain.Repairorderitem" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_repairorderitem (opid, mainid, pid,
+      amt1, amt2, num, totalamt
+      )
+    values (#{opid,jdbcType=VARCHAR}, #{mainid.optid,jdbcType=VARCHAR}, #{pid.id,jdbcType=VARCHAR},
+      #{amt1,jdbcType=DECIMAL}, #{amt2,jdbcType=DECIMAL}, #{num,jdbcType=INTEGER}, #{totalamt,jdbcType=DECIMAL}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.fours.domain.Repairorderitem" >
+    update t_repairorderitem
+    set mainid = #{mainid,jdbcType=VARCHAR},
+      pid = #{pid,jdbcType=VARCHAR},
+      amt1 = #{amt1,jdbcType=DECIMAL},
+      amt2 = #{amt2,jdbcType=DECIMAL},
+      num = #{num,jdbcType=INTEGER},
+      totalamt = #{totalamt,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=BIGINT}
+      and opid = #{opid,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="map" >
+    select id, opid, mainid, pid, amt1, amt2, num, totalamt
+    from t_repairorderitem
+    where id = #{id,jdbcType=BIGINT}
+      and opid = #{opid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, opid, mainid, pid, amt1, amt2, num, totalamt
+    from t_repairorderitem
+  </select>
+
+ <!-- <resultMap id="queryItems" type="com.fours.domain.Repairorderitem">
+      <id column="id" property="id"></id>
+      <result column="mainid" property="mainid"/>
+      <result column="amt1" property="amt1"/>
+      <result column="amt2" property="amt2"/>
+      <result column="num" property="num"/>
+      <result column="totalamt" property="totalamt"/>
+
+      <association property="id" javaType="com.fours.domain.Repairorder">
+        <id column="rid" property="id"/>
+      </association>
+
+      <association property="mainid" javaType="com.fours.domain.Maintainer">
+        <id column="moptid" property="optid"/>
+        <result column="mopt_name" property="optName"/>
+      </association>
+
+      <association property="pid" javaType="com.fours.domain.Parts">
+        <id column="pid" property="id"></id>
+        <result column="pparts_name" property="partsName"></result>
+      </association>
+
+  </resultMap>-->
+
+  <select id="selectByPage" resultMap="BaseResultMap" >
+   select id, opid, mainid, pid, amt1, amt2, num, totalamt from t_repairorderitem
+  </select>
+</mapper>

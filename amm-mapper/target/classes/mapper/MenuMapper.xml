@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fours.mapper.MenuMapper" >
+  <resultMap id="BaseResultMap" type="com.fours.domain.Menu" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="sn" property="sn" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="icon" property="icon" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_menu
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.fours.domain.Menu" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_menu (sn, name, parent_id,
+      icon, url)
+    values (#{sn,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{parentId,jdbcType=INTEGER},
+      #{icon,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.fours.domain.Menu" >
+    update t_menu
+    set sn = #{sn,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=INTEGER},
+      icon = #{icon,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, sn, name, parent_id, icon, url
+    from t_menu
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, sn, name, parent_id, icon, url
+    from t_menu
+  </select>
+  <select id="selectByPage" resultMap="BaseResultMap" >
+    select id, sn, name, parent_id, icon, url
+    from t_menu
+  </select>
+    <resultMap id="findMenus" type="com.fours.domain.Menu">
+        <!--<id column="id" property="id"></id>
+        <result column="sn" property="sn"></result>
+        <result column="name" property="name"></result>
+        <result column="parent_id" property="parentId"></result>
+        <result column="icon" property="icon"></result>
+        <result column="url" property="url"></result>
+        <collection property="children" ofType="com.fours.domain.Menu">
+            <id property="id" column="mid"></id>
+          <result column="msn" property="sn"></result>
+          <result column="mname" property="name"></result>
+          <result column="mparent_id" property="parentId"></result>
+          <result column="micon" property="icon"></result>
+          <result column="murl" property="url"></result>
+          <result column="mintro" property="intro"></result>
+        </collection>-->
+        <id property="id" column="id"/>
+        <result property="name" column="fmenu"/>
+        <collection property="children" ofType="Menu">
+            <id property="id" column="cid"/>
+            <result property="name" column="cname"/>
+            <result property="url" column="url"/>
+        </collection>
+    </resultMap>
+
+    <select id="findByMenus" resultMap="findMenus">
+       SELECT m.id,m.sn,m.name,m.parent_id,m.icon,m.url ,m.intro, cm.id mid ,cm.sn msn ,cm.name mname ,cm.parent_id mparent_id  ,cm.icon micon ,cm.url murl, cm.intro mintro
+       FROM t_menu m JOIN t_menu cm ON m.id = cm.parent_id
+       WHERE ISNULL(m.parent_id)
+    </select>
+    <select id="findMenusByUser" resultMap="findMenus">
+        SELECT fm.id,fm.name fmenu,cm.id cid,cm.name cname,cm.url FROM t_menu fm JOIN (SELECT m.* FROM t_user u JOIN user_role ru ON u.id = ru.user_id
+            JOIN t_role r ON ru.role_id = r.id JOIN role_permission rp on r.id = rp.role_id
+            JOIN t_permission p ON rp.permission_id = p.id
+            JOIN t_resource re ON p.resource_id = re.id
+            JOIN t_menu m ON re.menu_id = m.id
+        WHERE u.id = #{id}) cm ON fm.id = cm.parent_id ORDER BY fm.id
+    </select>
+</mapper>

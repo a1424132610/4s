@@ -1,0 +1,5 @@
+/.idea
+*.iml
+/basic-core/*.iml
+/amm-web/*.iml
+/amm-mapper/*.iml

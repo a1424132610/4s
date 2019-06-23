@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fours.mapper.PermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.fours.domain.Permission" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <association property="resource" javaType="com.fours.domain.Resource">
+      <id column="rid" property="id"/>
+      <result column="sn" property="sn"/>
+      <result column="url" property="url"/>
+    </association>
+  </resultMap>
+  <!--删除权限时，同时删除资源表中的权限-->
+  <delete id="deleteById" parameterType="Permission" >
+    DELETE p,r FROM t_permission p,t_resource r
+    WHERE p.id = #{id} AND r.id = #{resource.id}
+  </delete>
+  <!--添加-->
+  <insert id="insert" parameterType="Permission" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_permission (name, resource_id)
+    values (#{name,jdbcType=VARCHAR}, #{resource.id})
+  </insert>
+  <!--修改时同时修改两张表-->
+  <update id="updateByPrimaryKey" parameterType="Permission" >
+    UPDATE t_permission p,t_resource r SET p.name = #{name}, r.sn = #{resource.sn},r.url=#{resource.url}
+    WHERE p.id = #{id} AND r.id = #{id}
+  </update>
+
+  <select id="selectPermissionByRoleId" resultMap="BaseResultMap">
+    SELECT p.id id,p.name name,r.id rid,r.sn sn,r.url url from
+      role_permission rp
+      JOIN t_permission p ON rp.permission_id = p.id
+      JOIN t_resource r ON p.resource_id = r.id WHERE rp.role_id = #{id}
+  </select>
+
+  <!--查询所有的权限信息-->
+  <select id="selectByPage" resultMap="BaseResultMap" >
+    SELECT p.id,p.name,r.id rid,r.sn,r.url
+    FROM t_permission p JOIN t_resource r ON p.resource_id = r.id
+  </select>
+</mapper>

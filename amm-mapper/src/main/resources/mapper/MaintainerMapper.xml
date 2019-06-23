@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fours.mapper.MaintainerMapper" >
+  <resultMap id="BaseResultMap" type="com.fours.domain.Maintainer" >
+    <id column="optid" property="optid" jdbcType="BIGINT" />
+    <result column="opt_name" property="optName" jdbcType="VARCHAR" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="hire_date" property="hireDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_maintainer
+    where optid = #{optid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.fours.domain.Maintainer" >
+    insert into t_maintainer (optid, opt_name, age, 
+      email, hire_date)
+    values (#{optid,jdbcType=BIGINT}, #{optName,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, 
+      #{email,jdbcType=VARCHAR}, #{hireDate,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.fours.domain.Maintainer" >
+    update t_maintainer
+    set opt_name = #{optName,jdbcType=VARCHAR},
+      age = #{age,jdbcType=INTEGER},
+      email = #{email,jdbcType=VARCHAR},
+      hire_date = #{hireDate,jdbcType=TIMESTAMP}
+    where optid = #{optid,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select optid, opt_name, age, email, hire_date
+    from t_maintainer
+    where optid = #{optid,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select optid, opt_name, age, email, hire_date
+    from t_maintainer
+  </select>
+
+
+  <sql id="where_sql">
+    <where>
+      <if test="username!=null and username!=''">
+        AND (opt_name LIKE "%"#{username}"%" or email LIKE "%"#{username}"%")
+      </if>
+    </where>
+  </sql>
+  <select id="selectByPage" resultMap="BaseResultMap" >
+    select optid, opt_name, age, email, hire_date
+    from t_maintainer
+    <include refid="where_sql"></include>
+  </select>
+</mapper>

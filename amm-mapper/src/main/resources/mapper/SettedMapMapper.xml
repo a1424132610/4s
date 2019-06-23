@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fours.mapper.SettedMapMapper" >
+  <resultMap id="BaseResultMap" type="com.fours.domain.SettedMap" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="custormer_id" property="custormerId" jdbcType="VARCHAR" />
+    <result column="setted_time" property="settedTime" jdbcType="TIMESTAMP" />
+    <result column="total_money" property="totalMoney" jdbcType="DECIMAL" />
+    <result column="pay_id" property="payId" jdbcType="INTEGER" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_setted
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.fours.domain.SettedMap" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_setted (custormer_id, setted_time,
+      total_money, pay_id,
+      address)
+    values (#{custormerId,jdbcType=VARCHAR}, #{settedTime,jdbcType=TIMESTAMP},
+      #{totalMoney,jdbcType=DECIMAL}, #{payId,jdbcType=INTEGER},
+      #{address,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.fours.domain.SettedMap" >
+    update t_setted
+    set custormer_id = #{custormerId,jdbcType=VARCHAR},
+      setted_time = #{settedTime,jdbcType=TIMESTAMP},
+      total_money = #{totalMoney,jdbcType=DECIMAL},
+      pay_id = #{payId,jdbcType=INTEGER},
+      address = #{address,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, custormer_id,setted_time, total_money, pay_id,
+    address
+    from t_setted
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, custormer_id, setted_time,total_money, pay_id,
+    address
+    from t_setted
+  </select>
+
+  <!--分页and高级查询-->
+  <sql id="base_where">
+    <where>
+      <if test="address !=null and address !=''">
+        and (address like concat("%",#{address},"%"))
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectByPage" resultMap="BaseResultMap" >
+    select id, custormer_id, setted_time, total_money, pay_id,address
+    from t_setted
+    <include refid="base_where"></include>
+  </select>
+</mapper>

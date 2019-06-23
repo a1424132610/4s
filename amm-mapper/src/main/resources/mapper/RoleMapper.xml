@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fours.mapper.RoleMapper" >
+  <resultMap id="BaseResultMap" type="com.fours.domain.Role" >
+    <id property="id" column="id"/>
+    <result property="sn" column="sn"/>
+    <result property="name" column="role_name"/>
+    <collection property="permissions" ofType="com.fours.domain.Permission">
+      <id property="id" column="pid"/>
+      <result property="name" column="name"/>
+      <association property="resource" javaType="Resource">
+        <id property="id" column="tid"/>
+        <result property="url" column="url"/>
+      </association>
+    </collection>
+  </resultMap>
+  <!--首先删除掉role表中的角色  然后再删除中间表的权限-->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+      DELETE r,p FROM t_role r LEFT JOIN role_permission p ON r.id = p.role_id WHERE r.id =#{id}
+  </delete>
+  <!--根据id删除中间表的权限-->
+  <delete id="deletePermissionById" parameterType="long">
+    DELETE FROM role_permission WHERE role_id = #{id}
+  </delete>
+
+  <!--查询对应的角色-->
+  <insert id="insert" parameterType="Role" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_role (name,sn) values
+      (#{name}, #{sn})
+  </insert>
+  <!--插入角色的权限-->
+  <insert id="insertPermission" parameterType="Role">
+    INSERT  INTO role_permission(role_id,permission_id) VALUES
+    <foreach collection="permissions" item="p" separator=",">
+      (#{id},#{p.id})
+    </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="Role" >
+    update t_role
+    set sn = #{sn,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+  <resultMap id="PermissionById" type="com.fours.domain.Role" >
+    <id property="id" column="id"/>
+    <result property="sn" column="sn"/>
+    <result property="name" column="name"/>
+    <collection property="permissions" ofType="com.fours.domain.Permission" column="id"
+                select="com.fours.mapper.PermissionMapper.selectPermissionByRoleId">
+    </collection>
+  </resultMap>
+  <!--查询所有并且分页和高级查询-->
+  <select id="selectByPage" parameterType="BaseQuery" resultMap="PermissionById" >
+    SELECT DISTINCT r.id,r.name name,r.sn sn from t_user u JOIN user_role ur ON u.id = ur.user_id
+      JOIN t_role r ON ur.role_id = r.id
+  </select>
+
+  <!--根据user的id来查询权限-->
+  <select id="selectPermissionById" resultMap="PermissionById" >
+    SELECT r.id,r.name name,r.sn sn from t_user u JOIN user_role ur ON u.id = ur.user_id
+      JOIN t_role r ON ur.role_id = r.id
+    WHERE u.id = #{id}
+  </select>
+
+
+</mapper>

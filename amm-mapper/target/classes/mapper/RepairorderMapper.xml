@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fours.mapper.RepairorderMapper" >
+  <resultMap id="BaseResultMap" type="com.fours.domain.Repairorder" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="custormer" property="custormer" jdbcType="VARCHAR" />
+    <result column="carnum" property="carnum" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="zt" property="zt" jdbcType="BIT" />
+    <association property="optid" javaType="com.fours.domain.Maintainer" >
+      <id column="mid" property="optid"/>
+      <result column="mname" property="optName"></result>
+    </association>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_repairorder
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+
+
+  <insert id="insert" parameterType="com.fours.domain.Repairorder" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_repairorder (custormer, carnum, createtime, 
+      status, optid, address,zt)
+    values (#{custormer,jdbcType=VARCHAR}, #{carnum,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=BIT}, #{optid.optid,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},#{zt,jdbcType=BIT})
+  </insert>
+
+
+  <update id="updateByPrimaryKey" parameterType="com.fours.domain.Repairorder" >
+    update t_repairorder
+    set custormer = #{custormer,jdbcType=VARCHAR},
+      carnum = #{carnum,jdbcType=VARCHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=BIT},
+      optid = #{optid.optid,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+  <update id="updateByZt" >
+     update t_repairorder  set zt=0 WHERE id=#{id};
+  </update>
+
+  <update id="updateByZt2" >
+    update t_repairorder  set zt=1 WHERE id=#{id};
+  </update>
+
+
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, custormer, carnum, createtime, status, optid, address
+    from t_repairorder
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, custormer, carnum, createtime, status, optid, address
+    from t_repairorder
+  </select>
+
+  <sql id="where_sql">
+    <where>
+      <if test="username!=null and username!=''">
+        AND carnum LIKE "%"#{username}"%"
+      </if>
+    </where>
+  </sql>
+  <select id="selectByPage" resultMap="BaseResultMap" >
+    select r.id, r.custormer, r.carnum, r.createtime, r.status,m.optid mid ,m.opt_name mname, r.address
+    from t_repairorder r LEFT JOIN t_maintainer m ON r.optid=m.optid
+    <include refid="where_sql"></include>
+  </select>
+
+
+  <resultMap id="QueryResultMap" type="com.fours.domain.Repairorder">
+      <id column="id" property="id"/>
+      <collection property="items" ofType="com.fours.domain.Repairorderitem">
+          <id column="riid" property="id"/>
+          <result column="rimainid" property="mainid"/>
+          <result column="riamt1" property="amt1"/>
+          <result column="riamt2" property="amt2"/>
+          <result column="rinum" property="num"/>
+          <result column="ritotalamt" property="totalamt"/>
+          <result column="zt" property="zt"/>
+          <association property="mainid" javaType="com.fours.domain.Maintainer">
+            <id column="moptid" property="optid"/>
+            <result column="mopt_name" property="optName"/>
+          </association>
+          <association property="pid" javaType="com.fours.domain.Parts">
+            <id column="pid" property="id"></id>
+            <result column="pparts_name" property="partsName"></result>
+          </association>
+      </collection>
+  </resultMap>
+
+  <select id="queryByItems" resultMap="QueryResultMap">
+    select r.id ,ri.id riid,ri.mainid rimainid,m.optid moptid,m.opt_name mopt_name,p.id pid,p.parts_name pparts_name,ri.amt1 riamt1,ri.amt2 riamt2,ri.num rinum,ri.totalamt ritotalamt FROM t_repairorderitem ri
+    join t_repairorder r ON ri.opid=r.id
+    JOIN t_maintainer m ON r.optid=m.optid
+    JOIN	t_parts p ON ri.pid=p.id
+    where  r.id=#{id} and r.zt=true
+  </select>
+
+</mapper>
